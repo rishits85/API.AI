@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://www.google.com/jsapi" type="text/javascript"></script>
+ 
+    <script type="text/javascript">google.load("jquery", "1.3.2");</script>
+    <title>Portfolio Page</title>
+
+  </head>
+  <body>
+   <p id ="p1">hello</p>
+   <form>
+    <textarea name="message" id = "hotel" rows="1" cols="30">Hotel</textarea>
+    <br>
+    <textarea name="message" id = "room" rows="1" cols="30">Room</textarea>
+    <br>
+    <textarea name="message" id = "location" rows="1" cols="30">Location</textarea>
+    <br>
+    <button type= "button" id = "submit" onClick = "signInFunction()">Sign Up</button>
+  </form>
+  <a href = "LoginPage.html">Log in</a>
+  <div id = "result"></div>
+  <script>
+      // var formData = document.getElementById("submit");
+      // formData.addEventListener("click", signInFunction(), false);
+      function signInFunction() {
+
+        //COLLECT VALUES FROM FORM ELEMENTS
+        var hotel = $('#hotel').val();
+        var room = $('#room').val();
+        var location = $('#location').val();
+
+        //CREATE A JSON OBJECT OF THAT DATA
+        var data = {
+          "hotel":hotel,
+          "room":room,
+          "location":location
+        };
+           // for testing only
+        // myhotel = data.room;
+        // document.getElementById("p1").innerHTML = myhotel;
+
+
+        //AJAX POST REQUEST TO SIGN UP METHOD
+        $.ajax({
+        type: 'POST',
+        url: '/signup',
+        processData: false,
+        data: JSON.stringify(data),
+        contentType: 'application/octet-stream; charset=utf-8',
+        success: function(result) 
+        {
+          // Handle or verify the server response if necessary.
+          if(result)
+          {
+            //retrieve the value of the auth code sent by the backend server 
+            var parsed_data = JSON.parse(result);
+            var authcode = parsed_data.auth; 
+            var state = parsed_data.state;
+            var base_url = "https://oauth-redirect.googleusercontent.com/r/apiai-157320"
+            var redirect_url = base_url + "?code=" + authcode + "&state=" + state
+            $('#result').html('Sign Up successful');
+           setTimeout(function() 
+           {
+            //redirect to the url provided by google to provide them with an auth code. 
+            window.location.href = redirect_url;
+           }, 4000);
+            
+          } 
+        // else if () {
+
+            // console.log('There was an error:');
+          else 
+          {
+              var parsed_data = JSON.parse(result);
+              console.log(parsed_data);
+              $('#result').html('User Exists');
+          }
+        }
+      }); //end ajax request               
+    }// end sign up function
+  </script>
+  </body>
+</html>
